@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-controller-deployment
+  labels:
+    app: game-controller
+spec:
+  selector:
+    matchLabels:
+      app: game-controller
+  template:
+    metadata:
+      labels:
+        app: game-controller
+    spec:
+      containers:
+        - name: game-controller
+          image: salaboy/fmtok8s-game-controller
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-controller-service
+spec:
+  selector:
+    app: game-controller
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

@@ -7,7 +7,6 @@ import io.cloudevents.core.provider.EventFormatProvider;
 import io.cloudevents.jackson.JsonFormat;
 import io.cloudevents.spring.webflux.CloudEventHttpMessageReader;
 import io.cloudevents.spring.webflux.CloudEventHttpMessageWriter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.codec.CodecCustomizer;
@@ -19,15 +18,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 @SpringBootApplication
 @RestController
-@Slf4j
+//@Slf4j
 @SerializationHint(types = GameInfo.class, typeNames = "com.salaboy.fmtok8s.gamecontroller.GameInfo")
 public class GameControllerApplication {
+
+    private static final Logger log = Logger.getLogger(
+            GameControllerApplication.class.getName());
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
