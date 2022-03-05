@@ -7,6 +7,7 @@ import io.cloudevents.core.provider.EventFormatProvider;
 import io.cloudevents.jackson.JsonFormat;
 import io.cloudevents.spring.webflux.CloudEventHttpMessageReader;
 import io.cloudevents.spring.webflux.CloudEventHttpMessageWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.codec.CodecCustomizer;
@@ -17,19 +18,21 @@ import org.springframework.nativex.hint.SerializationHint;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 @SpringBootApplication
 @RestController
-//@Slf4j
+@Slf4j
 @SerializationHint(types = GameInfo.class, typeNames = "com.salaboy.fmtok8s.gamecontroller.GameInfo")
 public class GameControllerApplication {
 
-    private static final Logger log = Logger.getLogger(
-            GameControllerApplication.class.getName());
+    //@TODO: game monitor endpoints..
+    //      Rankings
+    //         Number of game sessions and levels
+    //      Create session with nickname so we can keep track of who is winning
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -58,6 +61,12 @@ public class GameControllerApplication {
         GameInfo gameInfo = new GameInfo("game-" + UUID.randomUUID().toString());
         levelsPerSession.put(gameInfo.getSessionId(), gameInfo);
         return gameInfo;
+    }
+
+    @PostMapping("/sessions/{sessionId}/start")
+    public void startLevel(@PathVariable() String sessionId){
+        levelsPerSession.get(sessionId).setCurrentLevelStarted(true);
+        levelsPerSession.get(sessionId).setStartedDate(new Date());
     }
 
     @GetMapping("/sessions")
@@ -90,10 +99,14 @@ public class GameControllerApplication {
         GameInfo gameInfo = objectMapper.readValue(cloudEvent.getData().toBytes(), GameInfo.class);
         // Here you can do whatever you want with your Application data:
         log.info("GameInfo SessionId: " + gameInfo.getSessionId());
-        log.info("GameInfo LevelId: " + gameInfo.getLevelId());
+        log.info("GameInfo LevelId: " + gameInfo.getCurrentLevelId());
 
         //Move to the next level
-        levelsPerSession.get(gameInfo.getSessionId()).setLevelId(gameInfo.getLevelId() + 1);
+        levelsPerSession.get(gameInfo.getSessionId()).setNextLevelId(gameInfo.getCurrentLevelId() + 1);
+        levelsPerSession.get(gameInfo.getSessionId()).setCurrentLevelCompleted(true);
+        levelsPerSession.get(gameInfo.getSessionId()).setCompletedDate(new Date());
+
+        //Send via websocket a CloudEvent to the UI ??
 
 
         return ResponseEntity.ok().build();

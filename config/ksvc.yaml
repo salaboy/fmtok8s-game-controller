@@ -1,0 +1,23 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: game-controller
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      containers:
+        - image: salaboy/fmtok8s-game-controller:0.1.0
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+          ports:
+            - containerPort: 8082
+              name: http1
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
