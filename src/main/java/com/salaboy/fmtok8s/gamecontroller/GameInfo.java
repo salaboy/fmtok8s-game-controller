@@ -19,16 +19,21 @@ public class GameInfo {
     @JsonProperty("completed")
     private boolean currentLevelCompleted = false;
     private Date completedDate;
+    private String nickname;
+
 
     public GameInfo() {
+        this.startedDate = new Date();
     }
 
     public GameInfo(String sessionId) {
+        this();
         this.sessionId = sessionId;
         this.currentLevelId = 1;
     }
 
     public GameInfo(String sessionId, int levelId) {
+        this();
         this.sessionId = sessionId;
         this.currentLevelId = levelId;
     }
@@ -95,5 +100,13 @@ public class GameInfo {
 
     public void setNextLevelId(int nextLevelId) {
         this.nextLevelId = nextLevelId;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }
